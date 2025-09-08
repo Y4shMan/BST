@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Tree Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 120px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(81, 207, 102, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+            color: #495057;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 212, 59, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .traversal-section {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .traversal-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .traversal-result {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 50px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #495057;
+        }
+
+        .canvas-container {
+            padding: 30px;
+            text-align: center;
+            background: white;
+        }
+
+        #treeCanvas {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: #fafbfc;
+            cursor: crosshair;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .info p {
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .traversal-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Binary Search Tree Visualizer</h1>
+            <p>Interactive visualization with insert, delete, and traversal operations</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="valueInput">Value:</label>
+                <input type="number" id="valueInput" placeholder="Enter value" min="0" max="999">
+                <button class="btn btn-primary" onclick="insertValue()">Insert</button>
+                <button class="btn btn-danger" onclick="deleteValue()">Delete</button>
+                <button class="btn btn-warning" onclick="clearTree()">Clear Tree</button>
+            </div>
+        </div>
+
+        <div class="traversal-section">
+            <h3 style="margin-bottom: 15px; color: #495057;">Tree Traversals</h3>
+            <div class="traversal-buttons">
+                <button class="btn btn-success" onclick="performTraversal('inorder')">Inorder</button>
+                <button class="btn btn-success" onclick="performTraversal('preorder')">Preorder</button>
+                <button class="btn btn-success" onclick="performTraversal('postorder')">Postorder</button>
+            </div>
+            <div class="traversal-result" id="traversalResult">
+                Click a traversal button to see the result...
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="treeCanvas" width="1000" height="600"></canvas>
+            <div class="info">
+                <h3>How to use:</h3>
+                <p>
+                    • <strong>Insert:</strong> Enter a number and click Insert to add it to the tree<br>
+                    • <strong>Delete:</strong> Enter a number and click Delete to remove it from the tree<br>
+                    • <strong>Traversals:</strong> Click any traversal button to see the order of nodes<br>
+                    • <strong>Clear:</strong> Click Clear Tree to remove all nodes
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TreeNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.x = 0;
+                this.y = 0;
+                this.level = 0;
+            }
+        }
+
+        class BinarySearchTree {
+            constructor() {
+                this.root = null;
+                this.canvas = document.getElementById('treeCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.nodeRadius = 25;
+                this.levelHeight = 80;
+                this.minNodeDistance = 60;
+            }
+
+            insert(value) {
+                const newNode = new TreeNode(value);
+                if (!this.root) {
+                    this.root = newNode;
+                } else {
+                    this.insertNode(this.root, newNode);
+                }
+                this.drawTree();
+            }
+
+            insertNode(node, newNode) {
+                if (newNode.value < node.value) {
+                    if (node.left === null) {
+                        node.left = newNode;
+                    } else {
+                        this.insertNode(node.left, newNode);
+                    }
+                } else if (newNode.value > node.value) {
+                    if (node.right === null) {
+                        node.right = newNode;
+                    } else {
+                        this.insertNode(node.right, newNode);
+                    }
+                }
+            }
+
+            delete(value) {
+                this.root = this.deleteNode(this.root, value);
+                this.drawTree();
+            }
+
+            deleteNode(node, value) {
+                if (node === null) {
+                    return null;
+                }
+
+                if (value < node.value) {
+                    node.left = this.deleteNode(node.left, value);
+                } else if (value > node.value) {
+                    node.right = this.deleteNode(node.right, value);
+                } else {
+                    if (node.left === null) {
+                        return node.right;
+                    } else if (node.right === null) {
+                        return node.left;
+                    }
+
+                    const minRight = this.findMin(node.right);
+                    node.value = minRight.value;
+                    node.right = this.deleteNode(node.right, minRight.value);
+                }
+                return node;
+            }
+
+            findMin(node) {
+                while (node.left !== null) {
+                    node = node.left;
+                }
+                return node;
+            }
+
+            inorderTraversal(node = this.root, result = []) {
+                if (node !== null) {
+                    this.inorderTraversal(node.left, result);
+                    result.push(node.value);
+                    this.inorderTraversal(node.right, result);
+                }
+                return result;
+            }
+
+            preorderTraversal(node = this.root, result = []) {
+                if (node !== null) {
+                    result.push(node.value);
+                    this.preorderTraversal(node.left, result);
+                    this.preorderTraversal(node.right, result);
+                }
+                return result;
+            }
+
+            postorderTraversal(node = this.root, result = []) {
+                if (node !== null) {
+                    this.postorderTraversal(node.left, result);
+                    this.postorderTraversal(node.right, result);
+                    result.push(node.value);
+                }
+                return result;
+            }
+
+            clear() {
+                this.root = null;
+                this.drawTree();
+            }
+
+            calculatePositions() {
+                if (!this.root) return;
+
+                const levels = {};
+                this.assignLevels(this.root, 0, levels);
+
+                Object.keys(levels).forEach(level => {
+                    const nodes = levels[level];
+                    const levelWidth = this.canvas.width - 100;
+                    const spacing = levelWidth / (nodes.length + 1);
+
+                    nodes.forEach((node, index) => {
+                        node.x = spacing * (index + 1);
+                        node.y = 50 + level * this.levelHeight;
+                        node.level = parseInt(level);
+                    });
+                });
+            }
+
+            assignLevels(node, level, levels) {
+                if (node === null) return;
+
+                if (!levels[level]) {
+                    levels[level] = [];
+                }
+                levels[level].push(node);
+
+                this.assignLevels(node.left, level + 1, levels);
+                this.assignLevels(node.right, level + 1, levels);
+            }
+
+            drawTree() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                if (!this.root) {
+                    this.ctx.fillStyle = '#666';
+                    this.ctx.font = '20px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('Tree is empty', this.canvas.width / 2, this.canvas.height / 2);
+                    return;
+                }
+
+                this.calculatePositions();
+                this.drawConnections(this.root);
+                this.drawNodes(this.root);
+            }
+
+            drawConnections(node) {
+                if (node === null) return;
+
+                this.ctx.strokeStyle = '#4facfe';
+                this.ctx.lineWidth = 3;
+                this.ctx.lineCap = 'round';
+
+                if (node.left) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(node.x, node.y + this.nodeRadius);
+                    this.ctx.lineTo(node.left.x, node.left.y - this.nodeRadius);
+                    this.ctx.stroke();
+                    this.drawConnections(node.left);
+                }
+
+                if (node.right) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(node.x, node.y + this.nodeRadius);
+                    this.ctx.lineTo(node.right.x, node.right.y - this.nodeRadius);
+                    this.ctx.stroke();
+                    this.drawConnections(node.right);
+                }
+            }
+
+            drawNodes(node) {
+                if (node === null) return;
+
+                // Draw node circle
+                this.ctx.fillStyle = '#4facfe';
+                this.ctx.strokeStyle = '#2196f3';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.arc(node.x, node.y, this.nodeRadius, 0, 2 * Math.PI);
+                this.ctx.fill();
+                this.ctx.stroke();
+
+                // Draw value text
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = 'bold 16px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText(node.value.toString(), node.x, node.y);
+
+                this.drawNodes(node.left);
+                this.drawNodes(node.right);
+            }
+        }
+
+        // Initialize BST
+        const bst = new BinarySearchTree();
+
+        // Event handlers
+        function insertValue() {
+            const input = document.getElementById('valueInput');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value)) {
+                alert('Please enter a valid number');
+                return;
+            }
+
+            bst.insert(value);
+            input.value = '';
+            input.focus();
+        }
+
+        function deleteValue() {
+            const input = document.getElementById('valueInput');
+            const value = parseInt(input.value);
+            
+            if (isNaN(value)) {
+                alert('Please enter a valid number');
+                return;
+            }
+
+            bst.delete(value);
+            input.value = '';
+            input.focus();
+        }
+
+        function clearTree() {
+            if (confirm('Are you sure you want to clear the entire tree?')) {
+                bst.clear();
+                document.getElementById('traversalResult').textContent = 'Tree cleared. Click a traversal button to see the result...';
+            }
+        }
+
+        function performTraversal(type) {
+            if (!bst.root) {
+                document.getElementById('traversalResult').textContent = 'Tree is empty';
+                return;
+            }
+
+            let result;
+            switch (type) {
+                case 'inorder':
+                    result = bst.inorderTraversal();
+                    break;
+                case 'preorder':
+                    result = bst.preorderTraversal();
+                    break;
+                case 'postorder':
+                    result = bst.postorderTraversal();
+                    break;
+            }
+
+            document.getElementById('traversalResult').textContent = 
+                `${type.charAt(0).toUpperCase() + type.slice(1)}: [${result.join(', ')}]`;
+        }
+
+        // Allow Enter key to insert
+        document.getElementById('valueInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                insertValue();
+            }
+        });
+
+        // Initial draw
+        bst.drawTree();
+    </script>
+</body>
+</html>
